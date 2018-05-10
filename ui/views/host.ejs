@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.dev.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  <body>
+    <div id="page">
+      <div id="live-feed">
+        <video src="" width="100%" autoplay="true" id="video"></video>
+      </div>
+      <canvas style="display:none" id="preview"></canvas>
+      <div id="logger"></div>
+    </div>
+    <script type="text/javascript">
+      var canvas = document.getElementById("preview"),
+          context = canvas.getContext("2d");
+      canvas.width = 800;
+      canvas.height = 600;
+
+      context.width = canvas.width;
+      context.height = canvas.height;
+
+      var video = document.getElementById("video");
+
+      var socket = io();
+
+      function logger(msg)
+      {
+        $("#logger").text(msg);
+      }
+
+      function loadCam(stream)
+      {
+        var vendorUrl = window.URL || window.webkitURL;
+        video.src = vendorUrl.createObjectURL(stream);
+        logger("WORKS!!!!");
+      }
+
+      function loadFail()
+      {
+        logger("Camera doesn't work");
+      }
+
+      function viewVideo(video, context)
+      {
+        context.drawImage(video,0,0,context.width,context.height);
+        socket.emit('stream', canvas.toDataURL('img/webp'));
+      }
+      $(function() {
+        navigator.getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msgGetUserMedia);
+
+        if(navigator.getUserMedia)
+        {
+          navigator.getUserMedia({video: true}, loadCam, loadFail);
+        }
+
+        setInterval(function(){
+          viewVideo(video,context);
+        }, 120);
+      });
+    </script>
+  </body>
+</html>

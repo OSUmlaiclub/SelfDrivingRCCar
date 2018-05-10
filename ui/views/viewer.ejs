@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.dev.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  <body>
+    <div id="page">
+      <div id="primary">
+        <div id="live-feed">
+          <img width="100%" id="play" >
+          <div id="logger"></div>
+        </div>
+        <div id="control-panel">
+          <form class="start-btn">
+            <input type="radio" name="on" value="0" id="on-btn"> On<br>
+            <input type="radio" name="off" value="1" id="off-btn"> Off
+          </form>
+          <div id="text-area">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco..</p>
+          </div><data value=></data>
+          <form id="accuraction-slide">
+            <input type="range" list="tickmarks" name="rate" min="1" max="5">
+            <datalist id="tickmarks">
+              <option value="1" label="0%">
+              <option value="2">
+              <option value="3" label="50%">
+              <option value="4">
+              <option value="5" label="100%">
+            </datalist>
+          </form>
+          <div id="movement-btn">
+            <input type="button" id="move-front"> Front<br>
+            <input type="button" id="move-left"> Left<br>
+            <input type="button" id="move-right"> Right<br>
+            <input type="button" id="move-back"> Back<br>
+          </div>
+        </div>
+      </div>
+      <!--<div class="secondary">
+        <img src="/img/test.jpg" alt="">
+      </div>-->
+    </div>
+    <script src="/js/connection.js"></script>
+  </body>
+</html>

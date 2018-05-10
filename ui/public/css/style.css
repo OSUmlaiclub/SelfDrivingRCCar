@@ -19,11 +19,12 @@ body {
   float: left;
   width: 100%;
 }
-#live-feed img {
+#live-feed video {
   min-width: 100%;
+  background: red;
 }
 #control-panel {
   float: right;
-  width: 20%;
+  min-width: 100%;
 }
 /* on and off button */

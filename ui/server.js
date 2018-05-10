@@ -27,7 +27,10 @@ app.use('/', express.static(__dirname + '/public/'));
 
 // Define routes
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('viewer');
+});
+app.get('/host', function(req, res) {
+  res.render('host');
 });
 app.get('*', function(req, res) {
   res.render('404');
@@ -45,6 +48,7 @@ var message = {
   rate: 3,
   move: 0
 };
+
 // web socket
 var io = socket(server);
 io.on('connection', function(socket) {
@@ -53,23 +57,31 @@ io.on('connection', function(socket) {
   io.sockets.emit('update', message);
   console.log('data sent to client (Fresh)');
 
+  socket.on('stream', function(data) {
+    socket.broadcast.emit('stream', data);
+  });
+
   socket.on('startBtn', function(data) {
-    console.log('reseved value', data.switch);
+    if(data.switch == 1) console.log('OFF');
+    else if(data.switch == 0) console.log('ON');
     message.switch = data.switch;
     io.sockets.emit('update', message);
     console.log('data sent to client (startBtn)');
   });
 
   socket.on('rate', function(data) {
-    console.log('reseved value', data.rate);
+    console.log('rate =', data.rate);
     message.rate = data.rate;
     io.sockets.emit('update', message);
     console.log('data sent to client (rate)');
   });
 
   socket.on('move', function(data) {
-    console.log('reseved value', data.move);
-    message.rate = data.move;
+    if(data.move == 1) console.log('FORWARD', data.switch);
+    else if(data.move == 2) console.log('BACKWARD', data.switch);
+    else if(data.move == 3) console.log('LEFT', data.switch);
+    else if(data.move == 4) console.log('RIGHT', data.switch);
+    message.move = data.move;
     io.sockets.emit('update', message);
     console.log('data sent to client (move)');
   });

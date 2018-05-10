@@ -1,4 +1,5 @@
 // make connection
+var getUrl = window.location;
 var socket = io.connect('http://localhost:8080');
 
 // query DOM
@@ -12,57 +13,51 @@ var liveFeed = document.getElementById('live-feed'),
   moveLeft = document.getElementById('move-left'),
   moveRight = document.getElementById('move-right');
 
-console.log(startBtn.on);
 // emit events
 startBtn.on.addEventListener('click', function() {
   console.log('sent value (on)', this.value);
   socket.emit('startBtn', {
     switch: this.value
   });
-  console.log('data sent to server (startBtn)');
+  //console.log('data sent to server (startBtn)');
 });
 startBtn.off.addEventListener('click', function() {
-  console.log('sent valu (off)', this.value);
+  console.log('sent value (off)', this.value);
   socket.emit('startBtn', {
     switch: this.value
   });
-  console.log('data sent to server (startBtn)');
+  //console.log('data sent to server (startBtn)');
 });
 accuractionRate.rate.addEventListener('click', function() {
+  //console.log('sent value (rate)', this.value);
   socket.emit('rate', {
-    rate: 1
+    rate: this.value
   });
-  console.log('data sent to server (rate)');
+  //console.log('data sent to server (rate)');
 });
 moveFront.addEventListener('click', function() {
   socket.emit('move', {
     move: 1
   });
-  console.log('data sent to server (moveFront)');
-});
-moveFront.addEventListener('click', function() {
-  socket.emit('move', {
-    move: 1
-  });
-  console.log('data sent to server (moveFront)');
-});
-moveBack.addEventListener('click', function() {
-  socket.emit('move', {
-    move: 2
-  });
-  console.log('data sent to server (moveBack)');
+  //console.log('data sent to server (moveFront)');
 });
 moveLeft.addEventListener('click', function() {
   socket.emit('move', {
-    move: 3
+    move: 2
   });
-  console.log('data sent to server (moveLeft)');
+  //console.log('data sent to server (moveLeft)');
 });
 moveRight.addEventListener('click', function() {
   socket.emit('move', {
+    move: 3
+  });
+  //console.log('data sent to server (moveRight)');
+});
+moveBack.addEventListener('click', function() {
+  socket.emit('move', {
     move: 4
   });
-  console.log('data sent to server (moveRight)');
+  //console.log('data sent to server (moveBack)');
 });
 
 socket.on('update', function(data) {
@@ -75,5 +70,10 @@ socket.on('update', function(data) {
 
   // set accuractionRate
 
-  accuractionRate.value = data.rate;
+  accuractionRate.rate.value = data.rate;
+});
+socket.on('stream', function(data) {
+  var img = document.getElementById("play");
+  img.src = data;
+  ("#logger").text(data);
 });
