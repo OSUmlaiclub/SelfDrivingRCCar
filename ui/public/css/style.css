@@ -1,0 +1,29 @@
+/* page format */
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#page {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#primary {
+  width: 100%;
+  height: 100%;
+}
+#live-feed {
+  float: left;
+  width: 100%;
+}
+#live-feed img {
+  min-width: 100%;
+}
+#control-panel {
+  float: right;
+  width: 20%;
+}
+/* on and off button */
