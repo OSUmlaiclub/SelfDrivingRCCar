@@ -8,7 +8,7 @@ var fs = require('fs'),
   path = require('path'),
   app = express(),
   http = http_module.Server(app);
-app.set('port', process.env.PORT || 8000);
+app.set('port', process.env.PORT || 8080);
 
 // reading json files
 //var currentPath = process.cwd();

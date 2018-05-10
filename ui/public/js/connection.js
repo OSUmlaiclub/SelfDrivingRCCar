@@ -1,5 +1,5 @@
 // make connection
-var socket = io.connect('http://localhost:8000');
+var socket = io.connect('http://localhost:8080');
 
 // query DOM
 var liveFeed = document.getElementById('live-feed'),
