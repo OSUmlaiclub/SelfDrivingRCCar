@@ -10,6 +10,8 @@ var fs = require('fs'),
   http = http_module.Server(app);
 app.set('port', process.env.PORT || 8080);
 
+var mode = ['switch', 'rate', 'move'];
+
 // reading json files
 //var currentPath = process.cwd();
 //var dataFolder = currentPath + '/data/';
@@ -62,9 +64,18 @@ io.on('connection', function(socket) {
   });
 
   socket.on('startBtn', function(data) {
-    if(data.switch == 1) console.log('OFF');
-    else if(data.switch == 0) console.log('ON');
+    if (data.switch == 1) console.log('OFF');
+    else if (data.switch == 0) console.log('ON');
     message.switch = data.switch;
+    var spawn = require('child_process').spawn;
+    var process = spawn('python', [
+      './controller.py', // program name
+      mode[0],
+      data.switch // action
+    ]);
+    process.stdout.on('data', function(data) {
+      console.log(data.toString()); // get the print in the python program
+    });
     io.sockets.emit('update', message);
     console.log('data sent to client (startBtn)');
   });
@@ -72,16 +83,34 @@ io.on('connection', function(socket) {
   socket.on('rate', function(data) {
     console.log('rate =', data.rate);
     message.rate = data.rate;
+    var spawn = require('child_process').spawn;
+    var process = spawn('python', [
+      './controller.py', // program name
+      mode[1],
+      data.rate // action
+    ]);
+    process.stdout.on('data', function(data) {
+      console.log(data.toString()); // get the print in the python program
+    });
     io.sockets.emit('update', message);
     console.log('data sent to client (rate)');
   });
 
   socket.on('move', function(data) {
-    if(data.move == 1) console.log('FORWARD', data.switch);
-    else if(data.move == 2) console.log('BACKWARD', data.switch);
-    else if(data.move == 3) console.log('LEFT', data.switch);
-    else if(data.move == 4) console.log('RIGHT', data.switch);
+    if (data.move == 1) console.log('FORWARD', data.move);
+    else if (data.move == 2) console.log('BACKWARD', data.move);
+    else if (data.move == 3) console.log('LEFT', data.move);
+    else if (data.move == 4) console.log('RIGHT', data.move);
     message.move = data.move;
+    var spawn = require('child_process').spawn;
+    var process = spawn('python', [
+      './controller.py', // program name
+      mode[2],
+      data.move // action
+    ]);
+    process.stdout.on('data', function(data) {
+      console.log(data.toString()); // get the print in the python program
+    });
     io.sockets.emit('update', message);
     console.log('data sent to client (move)');
   });
