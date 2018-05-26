@@ -1,7 +1,7 @@
 from __future__ import print_function
 import concurrent.futures
 from collections import deque
-from operator import itemgetter
+from time import clock
 
 from keras.applications.inception_resnet_v2 import preprocess_input, decode_predictions
 import keras.applications
@@ -220,6 +220,8 @@ def main():
     # the average prediction over an interval
     img_deque = deque(maxlen=NUM_PREDICTIONS_STORED)
 
+    timings = deque(maxlen=NUM_PREDICTIONS_STORED)
+
     # used to compute predictions in separate thread
     future = concurrent.futures.Future()
     ex = concurrent.futures.ThreadPoolExecutor(max_workers=1)
@@ -235,8 +237,12 @@ def main():
                      "T, G to increase\decreate horizontal detection stride"]
 
     cv2.namedWindow('prediction region')
-    cv2.namedWindow("Scanning window")
 
+    if SLIDING_WINDOW is True:
+        cv2.namedWindow("Scanning window")
+
+    t0 = clock()
+    
     # start main loop
     while True:
         webcam.tick()
@@ -264,26 +270,27 @@ def main():
                 else:
                     best_pred = future.result(timeout=1)
 
+                timings.append(clock()-t0)
+
                 # add prediction to queue for averaging
                 img_deque.append(best_pred)
                 # get the average label, average confidence of that label, 
                 # and the proporition of img_deque that contains that label
                 label_average, confidence, proportion_images_with_label = getAveragePrediction(img_deque)
-                
-                label_current      = "Current Prediction: {}     ".format(best_pred[0])
-                confidence_current = "Current Confidence: {:.3f} ".format(best_pred[1])
-                label_average      = "Average Prediction: {}     ".format(label_average)
-                confidence_average = "Average Confidence: {:.3f} ".format(confidence)
-                proportion_average = "Average Proportion: {:.3f} ".format(proportion_images_with_label)
-                box_corners        = "Box Corners: {}, {}        ".format((LEFT_EDGE, BOTTOM_EDGE), (RIGHT_EDGE, TOP_EDGE))
 
-                messages = [label_current, confidence_current, label_average,
-                            confidence_average, proportion_average, box_corners]
+                messages = ["Current Prediction: {}     ".format(best_pred[0]), 
+                            "Current Confidence: {:.3f} ".format(best_pred[1]), 
+                            "Average Prediction: {}     ".format(label_average),
+                            "Average Confidence: {:.3f} ".format(confidence), 
+                            "Average Proportion: {:.3f} ".format(proportion_images_with_label), 
+                            "Time taken for last inference: {:.2f} seconds".format(timings[-1])), 
+                            "Average time taken for inference: {:.2f} seconds per frame".format(sum(timings)/len(timings)),
+                            "Box Corners: Lower left: {}, Upper right: {}".format((LEFT_EDGE, BOTTOM_EDGE), (RIGHT_EDGE, TOP_EDGE))
+                            ]
 
                 if SLIDING_WINDOW is True:
-                    detection_stride = "Detection Window Vertical, Horizontal Stride: %d, %d" \
-                                        % (VERTICAL_WINDOW_STRIDE, HORIZONTAL_WINDOW_STRIDE)
-                    messages.append(detection_stride)
+                    messages+= ["Detection Window Vertical, Horizontal Stride: %d, %d" \
+                                        % (VERTICAL_WINDOW_STRIDE, HORIZONTAL_WINDOW_STRIDE)]
                 else:
                     messages.append("Sliding window is off")
 
@@ -294,6 +301,7 @@ def main():
             for message in messages:
                 print(message)
 
+            t0 = clock()
             # get the prediction of the current frame in a separate thread
             if SLIDING_WINDOW is True:
                 future = ex.submit(getTopPredictions, model, frame.copy())
@@ -301,7 +309,7 @@ def main():
                 future = ex.submit(getSinglePrediction, model, cropped_frame.copy())
 
         # draw controls on separate frame
-        control_frame = np.zeros((300, 800, 3))
+        control_frame = np.zeros((500, 800, 3))
         for message in messages + controls:
             webcam.display_text(control_frame, message)
         cv2.imshow('controls', control_frame)
