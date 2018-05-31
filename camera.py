@@ -54,9 +54,8 @@ class MyCamera:
                           min_thresh=None, max_thresh=None):
         t_gray1 = cv2.cvtColor(self.frame1.copy(), cv2.COLOR_BGR2GRAY)
         t_gray2 = cv2.cvtColor(self.old_frames[-1].copy(), cv2.COLOR_BGR2GRAY)
-        cv2.blur(t_gray1, (3, 3))
-        cv2.blur(t_gray2, (3, 3))
-        difference = cv2.absdiff(t_gray1, t_gray2)
+        
+        difference = cv2.absdiff( cv2.blur(t_gray1, (3, 3)), cv2.blur(t_gray2, (3, 3)) )
         ret, threshold = cv2.threshold(difference, self.min_difference_threshold, self.max_difference_threshold, cv2.THRESH_BINARY)
         for i in range(dilation_iterations):
             threshold = cv2.dilate(threshold, dilation_kernel)
@@ -87,6 +86,11 @@ class MyCamera:
         cv2.putText(image, text, (5, self.text_display_offset), cv2.FONT_HERSHEY_SIMPLEX, .75, (0, 0, 0), 7)
         cv2.putText(image, text, (5, self.text_display_offset), cv2.FONT_HERSHEY_SIMPLEX, .75, color, 2)
         self.text_display_offset += 25
+        return image
+    
+    def display_texts(self, image, text_lines, color=(255, 255, 255)):
+        for text_str in text_lines:
+            self.display_text(image, text_str)
         return image
         
     # update frames
